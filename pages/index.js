@@ -1,8 +1,7 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Title, Main, Button, Input } from '../styledComponents';
 
 export default function Home() {
   const [user, setUser] = useState("");
@@ -16,29 +15,26 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Github users" />
+        <title>Equiqo - Tech Check - Home</title>
+        <meta name="description" content="Find me some Github users" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Search users
-        </h1>
+      <Main>
+        <Title>
+          Find me some Github users
+        </Title>
         <form onSubmit={handleSearch}>
-          <label>
-            Git hub user
-            <input type="text" name="name" onChange={handleChange} />
-          </label>
-          <button type="submit">
+          <Input type="text" name="name" onChange={handleChange} placeholder="type a name" />
+          <Button type="submit">
             <Link href={`/users/?user=${encodeURIComponent(user)}`}>
               Search
             </Link>
-          </button>
+          </Button>
         </form>
-      </main>
+      </Main>
     </div>
   )
 }

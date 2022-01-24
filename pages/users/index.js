@@ -1,31 +1,56 @@
 import { useRouter } from 'next/router'
+import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image'
 
 import { headers, baseUrl } from '../../misc/githubGraphQLinfo';
+import { Title, GridContainer, Card, CardHeader, CardHeaderSecondary, Button, CardParagraph } from '../../styledComponents';
 
 const UsersList = ({ users }) => {
   const router = useRouter();
   const { user } = router.query;
-  return (<div>
-    <p>List of found user, which included {user}</p>
-    <ul>
-      {users.map((user) => (
-        <li key={user.id}>
-        <h3>
-            <Link href={`/users/${user.login}`}>
-              <a>
-                {user.login}
-              </a>
-            </Link>
-          </h3>
-        </li>
-      ))}
-    </ul>
+  return (users && <div>
+    <Head>
+      <title>`Equiqo - Tech Check - users including {user}`</title>
+      <meta name="description" content="List of Github users " />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
+    <Title>There&apos;s some users, which was found shearching for {user == '' ? "anyone" : user}</Title>
+    <GridContainer>
+      {users.map((user) => {
+        let {
+          id,
+          name,
+          login,
+          location,
+          email,
+          avatarUrl
+        } = user;
+        return (
+          <Card key={id}>
+            <Image src={avatarUrl}
+              alt={`Picture of ${login}`}
+              width={260}
+              height={260}
+            />
+            <CardHeader>{login}</CardHeader>
+            <CardHeaderSecondary>{name}</CardHeaderSecondary>
+            <CardParagraph>location: {location}</CardParagraph>
+            <CardParagraph>email: {email}</CardParagraph>
+            <Button filled>
+              <Link href={`/users/${login}`}>
+                <a>show more</a>
+              </Link>
+            </Button>
+          </Card>
+        )
+      })}
+    </GridContainer>
   </div>)
 };
 
 
-export async function getServerSideProps({query}) {
+export async function getServerSideProps({ query }) {
   const user = query.user;
   const res = await fetch(baseUrl, {
     method: "POST",
@@ -45,9 +70,10 @@ export async function getServerSideProps({query}) {
               ...on User {
                 id
                 login
-                bio
+                name
+                email
+                location
                 avatarUrl
-                company
               }
           }
         }
@@ -55,15 +81,15 @@ export async function getServerSideProps({query}) {
         `,
       variables: {
         "user": user,
-        "items" : 100
+        "items": 100
       },
     }),
   });
-  const users = await res.json()
+  const response = await res.json()
 
   return {
     props: {
-      users: users.data.search.nodes,
+      users: response.data.search.nodes
     },
   }
 }
